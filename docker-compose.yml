@@ -1,0 +1,66 @@
+version: "3.8"
+services:
+  vehicle-market-value-api-app:
+    container_name: vehicle_market_value_api_container
+    # image: lingges/flasapi:latest
+    build: . # Build the image using the Dockerfile in the current directory
+    restart: always
+    ports:
+      - "8000:8000" 
+    command: uvicorn App.Main:app --host 0.0.0.0 --port 8000 --reload
+    env_file:
+      - Config/.env
+    volumes:
+      - ./:/usr/src/app
+    depends_on:
+      - postgres
+      - pgadmin
+
+  pgadmin:
+      container_name: pgadmin4_container
+      image: dpage/pgadmin4
+      restart: always
+      ports:
+        - "5050:80"
+      env_file:
+        - ./Config/.env
+
+      depends_on:
+        - postgres
+
+  postgres:
+    container_name: postgres_container
+    image: postgres:15.2
+    restart: always
+    ports:
+      - "5432:5432"
+    env_file:
+      - Config/.env
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  # nginx:
+  #   container_name: nginx_container
+  #   image: nginx:latest
+  #   restart: always
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./Nginx/nginx.conf:/etc/nginx/nginx.conf
+  #     - ./certbot/www:/var/www/certbot/:ro
+  #     - ./certbot/conf/:/etc/nginx/ssl/:ro
+  #   depends_on:
+  #     - fastapi-app
+
+  # certbot:
+  #   container_name: certbot
+  #   image: certbot/certbot
+  #   restart: always
+  #   volumes:
+  #     - ./certbot/conf:/etc/letsencrypt/:rw
+  #     - ./certbot/www:/var/www/certbot/:rw
+  #   #command: certonly --webroot -w /var/www/certbot --force-renewal --email linggest90@gmail.com -d ephongapi.com --agree-tos
+
+volumes:
+  postgres_db:
