@@ -50,7 +50,7 @@ def login(response: Response, user_credentials: OAuth2PasswordRequestForm = Depe
                                                       "role_id": user_query.role,
                                                       "working_status": user_query.working_status})
       
-      print(f"user_query: {user_query.working_status}")
+      # print(f"user_query: {user_query.working_status}")
       response.status_code = status.HTTP_200_OK
       return {'status': 'success',
               'access_token': access_token,
