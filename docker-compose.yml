@@ -7,7 +7,8 @@ services:
     restart: always
     ports:
       - "8000:8000" 
-    command: uvicorn App.Main:app --host 0.0.0.0 --port 8000
+    command: gunicorn -w 4 -k uvicorn.workers.UvicornWorker App.Main:app --bind 0.0.0.0:8000
+    # command: uvicorn App.Main:app --host 0.0.0.0 --port 8000
     env_file:
       - Config/.env
     volumes:
@@ -39,6 +40,21 @@ services:
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
+  nginx:
+    container_name: nginx_container
+    image: nginx:latest
+    restart: always
+    ports:
+      - "8000:80"
+      - "443:443"
+    volumes:
+      - ./Nginx/nginx.conf:/etc/nginx/nginx.conf
+      # - ./certs:/etc/nginx/ssl/ # Map local certs directory to /etc/nginx/ssl/ in the container
+      # - ./certbot/www:/var/www/certbot/:ro
+      # - ./certbot/conf/:/etc/nginx/ssl/:ro
+    depends_on:
+      - vehicle-market-value-api-app
+
   # nginx:
   #   container_name: nginx_container
   #   image: nginx:latest
@@ -48,10 +64,11 @@ services:
   #     - "443:443"
   #   volumes:
   #     - ./Nginx/nginx.conf:/etc/nginx/nginx.conf
+  #     - ./certs:/etc/nginx/ssl/ # Map local certs directory to /etc/nginx/ssl/ in the container
   #     - ./certbot/www:/var/www/certbot/:ro
   #     - ./certbot/conf/:/etc/nginx/ssl/:ro
   #   depends_on:
-  #     - fastapi-app
+  #     - vehicle-market-value-api-app
 
   # certbot:
   #   container_name: certbot
