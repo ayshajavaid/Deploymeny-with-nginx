@@ -69,7 +69,7 @@ def check_Admin_User_Role_ID_Status(current_user):
         return False
     
 def check_General_User_Role_ID_Status(current_user):
-    if current_user.role_id in [1, 2, 4]:  # Only SuperAdmin:1, Admin:2 and Employee:4 are authorized
+    if current_user.role_id in [1, 2, 3]:  # Only SuperAdmin:1, Admin:2 and Employee:3 are authorized
         return True
     else:
         return False
